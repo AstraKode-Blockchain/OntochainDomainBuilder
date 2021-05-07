@@ -11,19 +11,18 @@ async function main() {
   //
   // If this script is run directly using `node` you may want to call compile
   // manually to make sure everything is compiled
-  // await hre.run('compile');
+  await hre.run('compile');
 
   // We get the contract to deploy
-  const Cert = await hre.ethers.getContractFactory("Cert");
-  const cert = await Cert.deploy();
+  const Certify = await hre.ethers.getContractFactory("Certify");
+  const certify = await Certify.deploy("Icertify", "icertify.com");
 
-  await cert.deployed();
+  await certify.deployed();
 
-  console.log("Cert deployed to:", cert.address);
+  console.log("Certify deployed to:", certify.address);
 
-  await cert.issue('0x5fbdb2315678afecb367f032d93f642f64180aa3',
+  await certify.issue('0x5fbdb2315678afecb367f032d93f642f64180aa3',
                    'plastic_free', 2234560000);
-  await cert.prove('plastic_free');
 }
 
 // We recommend this pattern to be able to use async/await everywhere
