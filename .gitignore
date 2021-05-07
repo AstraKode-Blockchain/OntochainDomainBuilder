@@ -1,0 +1,6 @@
+# hardhat-related files
+/usecases/node_modules/
+/usecases/cache/
+/usecases/hardhat.config.js
+/usecases/artifacts/
+
