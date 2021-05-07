@@ -57,6 +57,14 @@ contract Certify {
     _certification_body = CertificationBody(msg.sender, name, url);
   }
 
+  function certification_body_name() public view returns (string memory) {
+    return _certification_body.name;
+  }
+
+  function num_certificates(address holder) public view returns (uint) {
+    return _certificates[holder].num_certs;
+  }
+
   function issue(address holder, string memory cert, uint expiry) public {
     require(msg.sender == _certification_body.addr,
             "only certification body is allowed to issue certificates");
@@ -66,7 +74,7 @@ contract Certify {
     _certificates[holder].num_certs += 1;
     emit IssuedCertificate(holder, cert, expiry);
     console.log("issued '%s' to address '%s', will expire at: '%s'",
-                cert, msg.sender, expiry);
+                cert, holder, expiry);
   }
 
   function revoke(address holder, string memory cert) public {
