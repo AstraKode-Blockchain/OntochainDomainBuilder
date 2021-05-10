@@ -4,3 +4,5 @@
 /usecases/cache/
 /usecases/artifacts/
 
+# test-related stuff
+usecases/coverage*
