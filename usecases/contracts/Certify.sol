@@ -65,10 +65,10 @@ contract Certify {
     return _certificates[holder].num_certs;
   }
 
-  function expires_at(address holder, string memory cert) public view returns (uint) {
+  function is_valid(address holder, string memory cert) public view returns (bool) {
     console.log("address '%s' holds certificate '%s', which is valid until '%s'",
                 holder, cert, _certificates[holder].certs[cert]);
-    return _certificates[holder].certs[cert];
+    return _certificates[holder].certs[cert] > block.timestamp;
   }
 
   function issue(address holder, string memory cert, uint expiry) public {

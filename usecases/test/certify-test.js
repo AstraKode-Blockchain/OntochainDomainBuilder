@@ -17,7 +17,7 @@ describe("Certify", function() {
     await certify.issue(addr2.address, cert, expiry);
     expect(await certify.num_certificates(addr2.address)).to.equal(1);
     expect(await certify.connect(addr2).prove(cert));
-    expect(await certify.connect(addr3).expires_at(addr2.address, cert)).to.equal(expiry);
+    expect(await certify.connect(addr3).is_valid(addr2.address, cert)).to.be.true;
     // TODO test that expired or non-existent certificates cannot be proven
   });
 });
