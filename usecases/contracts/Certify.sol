@@ -65,6 +65,12 @@ contract Certify {
     return _certificates[holder].num_certs;
   }
 
+  function expires_at(address holder, string memory cert) public view returns (uint) {
+    console.log("address '%s' holds certificate '%s', which is valid until '%s'",
+                holder, cert, _certificates[holder].certs[cert]);
+    return _certificates[holder].certs[cert];
+  }
+
   function issue(address holder, string memory cert, uint expiry) public {
     require(msg.sender == _certification_body.addr,
             "only certification body is allowed to issue certificates");
