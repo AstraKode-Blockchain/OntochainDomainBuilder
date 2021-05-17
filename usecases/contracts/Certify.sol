@@ -48,49 +48,63 @@ contract Certify {
   event HoldsCertificate(address _holder, string _cert);
   event IssuedCertificate(address _holder, string _cert, uint _expiry);
 
-  CertificationBody _certification_body;
-  mapping (address => Certs) _certificates;
-  mapping (address => Holder) _public_data;
+  CertificationBody certificationBody;
+  mapping (address => Certs) certificates;
+  mapping (address => Holder) publicData;
 
   constructor(string memory name, string memory url) {
     console.log("Deploying a Certify contract");
-    _certification_body = CertificationBody(msg.sender, name, url);
+    certificationBody = CertificationBody(msg.sender, name, url);
   }
 
-  function issue(address holder, string memory cert, uint expiry) public {
-    require(msg.sender == _certification_body.addr,
+  function certificationBodyName() external view returns (string memory) {
+    return certificationBody.name;
+  }
+
+  function numCertificates(address holder) external view returns (uint) {
+    return certificates[holder].num_certs;
+  }
+
+  function isValid(address holder, string memory cert) external view returns (bool) {
+    console.log("address '%s' holds certificate '%s', which is valid until '%s'",
+                holder, cert, certificates[holder].certs[cert]);
+    return certificates[holder].certs[cert] > block.timestamp;
+  }
+
+  function issue(address holder, string memory cert, uint expiry) external {
+    require(msg.sender == certificationBody.addr,
             "only certification body is allowed to issue certificates");
     require(expiry > block.timestamp,
             "certificate already expired");
-    _certificates[holder].certs[cert] = expiry;
-    _certificates[holder].num_certs += 1;
+    certificates[holder].certs[cert] = expiry;
+    certificates[holder].num_certs += 1;
     emit IssuedCertificate(holder, cert, expiry);
     console.log("issued '%s' to address '%s', will expire at: '%s'",
-                cert, msg.sender, expiry);
+                cert, holder, expiry);
   }
 
-  function revoke(address holder, string memory cert) public {
-    require(msg.sender == _certification_body.addr,
+  function revoke(address holder, string memory cert) external {
+    require(msg.sender == certificationBody.addr,
             "only certification body is allowed to revoke certificates");
-    // require(_certificates[holder].certs[cert] <= block.timestamp,
+    // require(certificates[holder].certs[cert] <= block.timestamp,
     //         "only expired certificates can be revoked")
     console.log("revoked '%s' from address '%s', would have expired at: '%s'",
-                cert, msg.sender, _certificates[holder].certs[cert]);
-    _certificates[holder].certs[cert] = 0;
-    _certificates[holder].num_certs -= 1;
+                cert, msg.sender, certificates[holder].certs[cert]);
+    certificates[holder].certs[cert] = 0;
+    certificates[holder].num_certs -= 1;
   }
 
-  function prove(string memory cert) public {
-    require(_certificates[msg.sender].certs[cert] >= block.timestamp,
+  function prove(string memory cert) external {
+    require(certificates[msg.sender].certs[cert] >= block.timestamp,
             "sender does not own certificate or it expired");
     emit HoldsCertificate(msg.sender, cert);
     console.log("'%s' address has valid certificate: '%s'", msg.sender, cert);
   }
 
-  function update_data(string memory name, string memory url) public {
-    require(_certificates[msg.sender].num_certs != 0,
+  function updateData(string memory name, string memory url) external {
+    require(certificates[msg.sender].num_certs != 0,
             "only certificate holders can update their public data");
-    _public_data[msg.sender] = Holder(name, url);
+    publicData[msg.sender] = Holder(name, url);
   }
 }
 
